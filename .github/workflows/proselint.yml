@@ -1,0 +1,33 @@
+name: Proselint on Markdown
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+
+jobs:
+  lint:
+    name: Proselint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install proselint
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install proselint
+
+      - name: Run proselint on markdown files
+        run: |
+          echo "🔍 Scanning Markdown files with proselint..."
+          shopt -s globstar nullglob
+          failed=0
+          for file in **/*.md; do
+            echo "→ $file"
+            if ! proselint "$file"; then
+              failed=1
+            fi
+          done
+          exit $failed
